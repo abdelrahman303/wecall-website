@@ -61,13 +61,11 @@ export function StrategiesHero() {
         gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
       }
 
-      shots.forEach((el, i) => {
+      shots.forEach((el) => {
         gsap.set(el, {
           opacity: 0,
-          y: mobile ? 36 : 90,
-          x: mobile ? 0 : i % 2 === 0 ? -48 : 56,
-          rotate: mobile ? 0 : i % 2 === 0 ? -12 : 10,
-          scale: mobile ? 0.96 : 0.86,
+          y: mobile ? 28 : 40,
+          scale: mobile ? 0.98 : 0.94,
         });
       });
 
@@ -85,12 +83,10 @@ export function StrategiesHero() {
           shots,
           {
             opacity: 1,
-            x: 0,
             y: 0,
-            rotate: 0,
             scale: 1,
-            duration: 1.15,
-            stagger: 0.1,
+            duration: 1,
+            stagger: 0.08,
             ease: "power4.out",
           },
           0.22,
@@ -156,24 +152,13 @@ export function StrategiesHero() {
           const box = node.getBoundingClientRect();
           const x = (event.clientX - box.left) / box.width - 0.5;
           const y = (event.clientY - box.top) / box.height - 0.5;
-          tiltY(x * 7);
-          tiltX(-y * 5);
-          shots.forEach((el, i) => {
-            const depth = (i + 1) * 6;
-            gsap.to(el, {
-              x: x * depth,
-              y: y * depth,
-              duration: 0.85,
-              ease: "power3.out",
-              overwrite: "auto",
-            });
-          });
+          tiltY(x * 4);
+          tiltX(-y * 3);
         };
 
         const onLeave = () => {
           tiltY(0);
           tiltX(0);
-          gsap.to(shots, { x: 0, y: 0, duration: 0.9, ease: "power3.out" });
         };
 
         node.addEventListener("mousemove", onMove);
@@ -319,17 +304,21 @@ export function StrategiesHero() {
             {playbooks.map((book, i) => (
               <article key={book.n} className={`sth-shot sth-shot-${i + 1}`}>
                 <div className="sth-shot-inner">
-                  <ThemePhoto
-                    light={book.photo.light}
-                    dark={book.photo.dark}
-                    alt={book.name}
-                    className="sth-shot-img h-full w-full object-cover"
-                  />
-                  <span className="sth-shot-wash" />
-                  <div className="sth-shot-meta">
-                    <span>{book.n}</span>
-                    <strong>{book.name}</strong>
+                  <span className="sth-sprocket" aria-hidden />
+                  <div className="sth-shot-photo">
+                    <ThemePhoto
+                      light={book.photo.light}
+                      dark={book.photo.dark}
+                      alt={book.name}
+                      className="sth-shot-img h-full w-full object-cover"
+                    />
+                    <span className="sth-shot-wash" />
+                    <div className="sth-shot-meta">
+                      <span>{book.n}</span>
+                      <strong>{book.name}</strong>
+                    </div>
                   </div>
+                  <span className="sth-sprocket" aria-hidden />
                 </div>
               </article>
             ))}
