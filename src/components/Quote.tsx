@@ -115,7 +115,7 @@ export function Quote() {
   }, [price, records, leads]);
 
   return (
-    <section ref={root} id="apply" className="qt-section relative overflow-hidden py-12 md:py-28">
+    <section ref={root} id="apply" className="qt-section relative overflow-x-clip py-12 md:py-28">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gold/30" />
       <div className="qt-progress pointer-events-none absolute top-0 left-0 z-20 h-[3px] w-full bg-gold" />
       <p className="qt-watermark font-mariyam pointer-events-none absolute top-24 left-1/2 -translate-x-1/2 text-[26vw] leading-none text-[color:var(--qt-fg)] opacity-[0.05] md:text-[200px]">

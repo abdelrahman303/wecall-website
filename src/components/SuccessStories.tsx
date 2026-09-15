@@ -28,11 +28,11 @@ const cases = [
     metric: "$24K",
     metricLabel: "wholesale spread in month one",
     chips: ["1 caller + 10k records", "44 pre-vetted leads", "2 assignments closed"],
-    who: "James T#####",
-    firm: "TX P######## LLC",
+    who: "James Taylor",
+    firm: "TX Properties LLC",
     market: "Dallas, TX",
-    email: "james.t@txpr########.com",
-    phone: "+1 (817) 4##-####",
+    email: "james.t@txproperties.com",
+    phone: "+1 (817) 492-8371",
     quote:
       "We were burning thousands on Upwork freelancers who couldn't handle basic seller objections. Switched to a Starter desk to feed my own pipeline. The caller is trained on the 4 pillars, and leads land in GHL with clean notes. Two wholesale deals in Tarrant County in month one — it covers its own overhead if you work the data.",
     photo: photos.deals,
@@ -47,11 +47,11 @@ const cases = [
     metric: "06",
     metricLabel: "fix-and-flip contracts in 90 days",
     chips: ["3 callers + 1 AM", "comps & offers in-house", "~$84k net in 3 months"],
-    who: "Elena C#####",
-    firm: "Suncoast C########",
+    who: "Elena Carter",
+    firm: "Suncoast Capital",
     market: "Tampa, FL",
-    email: "e.carter@sunc########.com",
-    phone: "+1 (813) 7##-####",
+    email: "e.carter@suncoastcapital.com",
+    phone: "+1 (813) 745-9210",
     quote:
       "I don't have time on the dialer or initial seller negotiations while managing rehab sites. We took a Millionaire seat so their team handles calling and our AM runs comps and offers. Six fix-and-flip properties in 90 days. Solid pipeline without micromanaging the front end.",
     photo: photos.flip,
@@ -66,11 +66,11 @@ const cases = [
     metric: "04",
     metricLabel: "closed deals every month",
     chips: ["7 callers + 2 closers", "contracts to email", "hands-off signatures"],
-    who: "Marcus V#####",
-    firm: "Midwest E########",
+    who: "Marcus Vance",
+    firm: "Midwest Equities",
     market: "Columbus, OH",
-    email: "mvance@midw########.com",
-    phone: "+1 (614) 8##-####",
+    email: "mvance@midwestequities.com",
+    phone: "+1 (614) 832-4911",
     quote:
       "We scaled to a custom desk once the script and buy-box were dialed in. Now we run 7 callers and 2 closers through them. I get a notification when a contract needs a signature. A few weeks to iron out the market data, then a steady 4 deals a month — so I could step back and scale the STR portfolio overseas.",
     photo: photos.seats,
@@ -85,11 +85,11 @@ const cases = [
     metric: "48h",
     metricLabel: "skip-trace + dialer recovery",
     chips: ["Week-one disconnects", "Moe Kotait + QA stepped in", "Flow back above benchmark"],
-    who: "Brian M#####",
-    firm: "Keystone P########",
+    who: "Brian Miller",
+    firm: "Keystone Partners",
     market: "Atlanta, GA",
-    email: "b.miller@keyst########.com",
-    phone: "+1 (404) 5##-####",
+    email: "b.miller@keystonepartners.com",
+    phone: "+1 (404) 581-2294",
     quote:
       "We had a rough first week where the local data in our target submarket underperformed. Moe and his team recleaned the lists and adjusted dialer filters. Since that bottleneck was fixed, lead quality has been solid. Good to work with an outfit that actually picks up the phone.",
     photo: photos.nightDesk,
@@ -114,7 +114,8 @@ export function SuccessStories() {
     const capEl = node.querySelector<HTMLElement>(".ss-rail-cap");
     const dots = Array.from(node.querySelectorAll<HTMLElement>(".ss-dot"));
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const desktop = window.matchMedia("(min-width: 768px)").matches;
+    const desktopMq = window.matchMedia("(min-width: 768px)");
+    const desktop = desktopMq.matches;
     let active = 0;
     let pinSt: ScrollTrigger | undefined;
 
@@ -135,69 +136,88 @@ export function SuccessStories() {
     paint(0, 0.06);
 
     const ctx = gsap.context(() => {
-      if (!desktop) {
-        gsap.set(".ss-sec .tr-arc", { strokeDashoffset: 55 });
-        return;
-      }
+      const mm = gsap.matchMedia();
 
-      gsap.from(".ss-head-in", {
-        y: 36,
-        opacity: 0,
-        stagger: 0.08,
-        duration: 0.85,
-        ease: "power3.out",
-        scrollTrigger: { trigger: root.current, start: "top 78%" },
+      mm.add("(max-width: 767px)", () => {
+        gsap.set(".ss-sec .tr-arc", { strokeDashoffset: 55 });
       });
 
-      if (!reduce) {
-        gsap.to(".ss-script", {
-          yPercent: -18,
+      mm.add("(min-width: 768px)", () => {
+        gsap.from(".ss-head-in", {
+          y: 36,
+          opacity: 0,
+          stagger: 0.08,
+          duration: 0.85,
+          ease: "power3.out",
+          scrollTrigger: { trigger: root.current, start: "top 78%" },
+        });
+
+        if (!reduce) {
+          gsap.to(".ss-script", {
+            yPercent: -18,
+            ease: "none",
+            scrollTrigger: {
+              trigger: root.current,
+              start: "top bottom",
+              end: "top top",
+              scrub: 1,
+            },
+          });
+        }
+
+        gsap.fromTo(
+          ".ss-sec .tr-arc",
+          { strokeDashoffset: 553 },
+          {
+            strokeDashoffset: 55,
+            duration: reduce ? 0 : 1.4,
+            ease: "power2.out",
+            scrollTrigger: { trigger: ".ss-sec .tr-meter", start: "top 85%" },
+          },
+        );
+
+        if (reduce || !strip || !track) return;
+
+        const getX = () => -(track.scrollWidth - strip.clientWidth);
+
+        gsap.to(track, {
+          x: getX,
           ease: "none",
           scrollTrigger: {
-            trigger: root.current,
-            start: "top bottom",
-            end: "top top",
-            scrub: 1,
+            trigger: ".ss-pin",
+            start: "top top",
+            end: () => `+=${Math.max(track.scrollWidth - strip.clientWidth, window.innerHeight * 1.6)}`,
+            pin: true,
+            scrub: 0.85,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              pinSt = self;
+              const i = Math.min(cases.length - 1, Math.round(self.progress * (cases.length - 1)));
+              paint(i, self.progress);
+            },
           },
         });
-      }
-
-      gsap.fromTo(
-        ".ss-sec .tr-arc",
-        { strokeDashoffset: 553 },
-        {
-          strokeDashoffset: 55,
-          duration: reduce ? 0 : 1.4,
-          ease: "power2.out",
-          scrollTrigger: { trigger: ".ss-sec .tr-meter", start: "top 85%" },
-        },
-      );
-
-      if (reduce || !strip || !track) return;
-
-      const getX = () => -(track.scrollWidth - strip.clientWidth);
-
-      gsap.to(track, {
-        x: getX,
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".ss-pin",
-          start: "top top",
-          end: () => `+=${Math.max(track.scrollWidth - strip.clientWidth, window.innerHeight * 1.6)}`,
-          pin: true,
-          scrub: 0.85,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            pinSt = self;
-            const i = Math.min(cases.length - 1, Math.round(self.progress * (cases.length - 1)));
-            paint(i, self.progress);
-          },
-        },
       });
     }, root);
 
     let frame = 0;
+    let autoRaf = 0;
+    let resumeTimer = 0;
+    let paused = false;
+    const clones: HTMLElement[] = [];
+    let io: IntersectionObserver | undefined;
+    const pauseAuto = () => {
+      paused = true;
+      window.clearTimeout(resumeTimer);
+    };
+    const resumeAuto = () => {
+      window.clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => {
+        paused = false;
+      }, 3200);
+    };
+
     const onStripScroll = () => {
       if (desktop || !strip) return;
       if (frame) return;
@@ -212,6 +232,8 @@ export function SuccessStories() {
     };
 
     const onDot = (event: Event) => {
+      event.preventDefault();
+      event.stopPropagation();
       const button = event.currentTarget as HTMLElement;
       const i = Number(button.dataset.i || 0);
       const film = films[i];
@@ -222,27 +244,21 @@ export function SuccessStories() {
         }
         return;
       }
-      strip.scrollTo({ left: film.offsetLeft - 16, behavior: "smooth" });
+      pauseAuto();
+      const loopAt = track ? track.scrollWidth / 2 : 0;
+      if (loopAt > 0 && strip.scrollLeft >= loopAt) {
+        strip.scrollLeft -= loopAt;
+      }
+      strip.scrollTo({ left: Math.max(0, film.offsetLeft - 16), behavior: "smooth" });
+      paint(i, i / Math.max(cases.length - 1, 1));
+      resumeAuto();
     };
 
     strip?.addEventListener("scroll", onStripScroll, { passive: true });
-    dots.forEach((dot) => dot.addEventListener("click", onDot));
-
-    let autoRaf = 0;
-    let resumeTimer = 0;
-    let paused = false;
-    const clones: HTMLElement[] = [];
-    let io: IntersectionObserver | undefined;
-    const pauseAuto = () => {
-      paused = true;
-      window.clearTimeout(resumeTimer);
-    };
-    const resumeAuto = () => {
-      window.clearTimeout(resumeTimer);
-      resumeTimer = window.setTimeout(() => {
-        paused = false;
-      }, 1600);
-    };
+    dots.forEach((dot) => {
+      dot.addEventListener("click", onDot);
+      dot.addEventListener("pointerdown", pauseAuto);
+    });
 
     const stopAuto = () => {
       if (autoRaf) window.cancelAnimationFrame(autoRaf);
@@ -268,7 +284,7 @@ export function SuccessStories() {
         if (!paused) {
           const loopAt = track.scrollWidth / 2;
           if (loopAt > 0) {
-            strip.scrollLeft += 0.55;
+            strip.scrollLeft += 2.15;
             if (strip.scrollLeft >= loopAt) strip.scrollLeft -= loopAt;
           }
         }
@@ -300,7 +316,10 @@ export function SuccessStories() {
       strip?.removeEventListener("pointercancel", resumeAuto);
       io?.disconnect();
       strip?.removeEventListener("scroll", onStripScroll);
-      dots.forEach((dot) => dot.removeEventListener("click", onDot));
+      dots.forEach((dot) => {
+        dot.removeEventListener("click", onDot);
+        dot.removeEventListener("pointerdown", pauseAuto);
+      });
       ctx.revert();
     };
   }, []);
@@ -446,7 +465,7 @@ export function SuccessStories() {
             ))}
           </div>
         </div>
-        <div className="ss-scrub" aria-hidden>
+        <div className="ss-scrub hidden md:block" aria-hidden>
           <span className="ss-scrub-bar" />
         </div>
       </div>

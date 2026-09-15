@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { calendlyWidgetUrl, type CalendlyPrefill } from "../lib/calendly";
-import { calendlyEventName } from "../lib/calendlyEvent";
+import { calendlyEventName, calendlyPageHeight } from "../lib/calendlyEvent";
 import { useTheme } from "../context/ThemeContext";
 
 type Props = {
@@ -73,6 +73,27 @@ export function CalendlyEmbed({ url, name, email, answers = [], onScheduled }: P
     node.innerHTML = "";
     sent.current = false;
 
+    const sizeFrame = (height: number) => {
+      const frame = node.querySelector("iframe");
+      if (!frame || height < 320) return;
+      const next = `${Math.ceil(height)}px`;
+      frame.setAttribute("scrolling", "yes");
+      frame.style.height = next;
+      frame.style.minHeight = next;
+      node.style.minHeight = next;
+    };
+
+    const prepFrame = () => {
+      const frame = node.querySelector("iframe");
+      if (!frame) return false;
+      frame.setAttribute("scrolling", "yes");
+      frame.style.touchAction = "pan-y";
+      if (window.matchMedia("(max-width: 767px)").matches && !frame.style.height) {
+        sizeFrame(1100);
+      }
+      return true;
+    };
+
     loadScript()
       .then(() => {
         if (gone || !host.current || !window.Calendly) return;
@@ -86,12 +107,23 @@ export function CalendlyEmbed({ url, name, email, answers = [], onScheduled }: P
             customAnswers: customAnswers(answers),
           },
         });
+        requestAnimationFrame(() => {
+          if (!prepFrame()) {
+            const watch = new MutationObserver(() => {
+              if (prepFrame()) watch.disconnect();
+            });
+            watch.observe(node, { childList: true, subtree: true });
+            window.setTimeout(() => watch.disconnect(), 8000);
+          }
+        });
       })
       .catch(() => undefined);
 
     const onMessage = (event: MessageEvent) => {
       const origin = String(event.origin || "");
       if (origin && !origin.includes("calendly.com")) return;
+      const height = calendlyPageHeight(event.data);
+      if (height) sizeFrame(height);
       if (calendlyEventName(event.data) !== "calendly.event_scheduled") return;
       if (sent.current) return;
       sent.current = true;
@@ -107,5 +139,5 @@ export function CalendlyEmbed({ url, name, email, answers = [], onScheduled }: P
     };
   }, [url, name, email, answersKey, theme]);
 
-  return <div ref={host} className="qt-calendly" />;
+  return <div ref={host} className="qt-calendly" data-calendly-embed />;
 }

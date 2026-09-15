@@ -1321,21 +1321,17 @@ html.light .pr-wow-label {
   }
 
   .pr-urgency {
-    position: static;
-    bottom: auto;
+    position: sticky;
+    bottom: 12px;
+    z-index: 40;
   }
 
   .pr-section .marquee-track {
-    animation: none;
-    width: 100%;
-    max-width: 100%;
-    flex-wrap: wrap;
-    justify-content: center;
-    transform: none;
-  }
-
-  .pr-section .pr-stack-dup {
-    display: none;
+    animation: marquee 14s linear infinite;
+    width: max-content;
+    max-width: none;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
   }
 }
 
@@ -2760,7 +2756,7 @@ html.light .keep-dark .tr-meter-copy span {
 .ss-film {
   position: relative;
   flex: 0 0 86vw;
-  height: 72vh;
+  height: auto;
   overflow: hidden;
   border: 1px solid rgba(196, 158, 123, 0.28);
   border-radius: 22px;
@@ -2919,13 +2915,17 @@ html.light .keep-dark .tr-meter-copy span {
 
 .ss-dots {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   justify-content: center;
   padding: 0 16px 4px;
 }
 
 .ss-dots-mobile {
+  position: relative;
+  z-index: 6;
   display: flex;
+  pointer-events: auto;
+  padding: 2px 16px 6px;
 }
 
 .ss-rail .ss-dots {
@@ -2933,17 +2933,31 @@ html.light .keep-dark .tr-meter-copy span {
 }
 
 .ss-dot {
-  width: 8px;
-  height: 8px;
+  display: flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   border: 0;
-  border-radius: 999px;
-  background: rgba(196, 158, 123, 0.28);
+  background: transparent;
   cursor: pointer;
-  transition: width 0.35s ease, background 0.35s ease;
+  pointer-events: auto;
 }
 
-.ss-dot.is-on {
-  width: 28px;
+.ss-dot::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(196, 158, 123, 0.28);
+  transition:
+    width 0.35s ease,
+    background 0.35s ease;
+}
+
+.ss-dot.is-on::before {
+  width: 22px;
   background: #c49e7b;
 }
 
@@ -3034,6 +3048,7 @@ html.light .keep-dark .tr-meter-copy span {
   .ss-film {
     flex-basis: min(68vw, 900px);
     height: 100%;
+    min-height: 72vh;
     border-radius: 28px;
     scroll-snap-align: unset;
     transform: scale(0.93);
@@ -3155,31 +3170,43 @@ html.light .keep-dark .tr-meter-copy span {
     padding-bottom: 8px;
   }
 
+  .ss-pin,
+  .ss-stage,
+  .ss-filmstrip,
+  .ss-sec .pin-spacer {
+    height: auto !important;
+    min-height: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
   .ss-stage {
-    gap: 10px;
-    padding: 10px 0 4px;
+    gap: 2px;
+    padding: 8px 0 0;
   }
 
   .ss-filmstrip {
     overflow-x: auto;
-    overflow-y: visible;
+    overflow-y: hidden;
+    height: auto !important;
     scroll-snap-type: none;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x;
   }
 
   .ss-track {
-    align-items: stretch;
+    align-items: flex-start;
+    padding: 0 14px;
   }
 
   .ss-film {
     scroll-snap-align: none;
     flex-basis: 84vw;
-    height: auto;
+    height: auto !important;
+    min-height: 0 !important;
     max-height: none;
     display: flex;
     flex-direction: column;
-    overflow: visible;
+    overflow: hidden;
     background: #191d23;
     border-radius: 16px;
   }
@@ -3228,12 +3255,13 @@ html.light .keep-dark .tr-meter-copy span {
   }
 
   .ss-film-quote {
-    display: block;
+    display: -webkit-box;
     margin-top: 8px;
-    overflow: visible;
+    overflow: hidden;
     font-size: 13px;
     line-height: 1.45;
-    -webkit-line-clamp: unset;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
   }
 
   .ss-file {
@@ -3252,21 +3280,27 @@ html.light .keep-dark .tr-meter-copy span {
     transition: none;
   }
 
+  .ss-dots-mobile {
+    padding: 0 16px 4px;
+  }
+
   .ss-close {
-    margin-top: 4px;
+    margin-top: 0;
   }
 
   .ss-close .relative {
-    padding-top: 36px;
-    padding-bottom: 36px;
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  .ss-scrub {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
   }
 
   .ss-close h3 {
     font-size: 22px;
-  }
-
-  .ss-scrub {
-    margin: 0 14px 8px;
   }
 }
 
@@ -3847,6 +3881,7 @@ textarea.qt-float-input {
   overflow: hidden;
   border-radius: 18px;
   background: #191d23;
+  touch-action: pan-y;
 }
 
 html.light .qt-calendly {
@@ -3854,7 +3889,11 @@ html.light .qt-calendly {
 }
 
 .qt-calendly iframe {
+  display: block;
+  width: 100%;
   min-height: 680px;
+  border: 0;
+  touch-action: pan-y;
 }
 
 .qt-book-steps li {
@@ -4257,9 +4296,25 @@ html.light .qt-input[type="date"] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .qt-calendly,
+  .qt-section {
+    overflow: visible;
+  }
+
+  .qt-book.qt-frame {
+    overflow: visible;
+  }
+
+  .qt-calendly {
+    min-height: 1100px;
+    overflow: visible;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
   .qt-calendly iframe {
-    min-height: 620px;
+    min-height: 1100px;
+    pointer-events: auto;
+    touch-action: pan-y;
   }
 
   .qt-book-steps li button {

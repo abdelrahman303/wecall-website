@@ -7,10 +7,10 @@ import { photos } from "../media";
 gsap.registerPlugin(ScrollTrigger);
 
 const lines = [
-  ["Capped", "seats"],
-  ["keep", "lead"],
-  ["quality", "high,"],
-  ["deals", "close"],
+  ["Limited", "capacity"],
+  ["protects", "quality"],
+  ["and", "closes"],
+  ["every", "deal"],
 ];
 
 export function FillText() {
