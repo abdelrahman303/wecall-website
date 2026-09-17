@@ -10,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
 type Cycle = "monthly" | "annual";
 
 const monthly = [1500, 5500] as const;
-const annual = [16500, 60500] as const;
+const annual = [18000, 66000] as const;
 
 export function Pricing({ hideHeading = false }: { hideHeading?: boolean }) {
   const root = useRef<HTMLElement>(null);
@@ -251,7 +251,7 @@ export function Pricing({ hideHeading = false }: { hideHeading?: boolean }) {
       </div>
       <p className="mt-3 text-center font-manrope text-[12px] text-white/45">
         {cycle === "annual"
-          ? "Pay 11 months, operate 12. One month complimentary on Starter and Upcoming Millionaire."
+          ? "Annual billing is 12 × the monthly rate."
           : "Month-to-month. Switch to annual to hold today’s rate."}
       </p>
 
@@ -287,7 +287,7 @@ export function Pricing({ hideHeading = false }: { hideHeading?: boolean }) {
                 <FlipPrice
                   value={cycle === "monthly" ? monthly[i] : annual[i]}
                   compareAt={
-                    t.featured ? (cycle === "monthly" ? 6500 : 71500) : undefined
+                    t.featured ? (cycle === "monthly" ? 6500 : 78000) : undefined
                   }
                   suffix={cycle === "monthly" ? "/ month" : "/ year"}
                   featured={t.featured}

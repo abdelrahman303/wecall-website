@@ -3843,6 +3843,14 @@ html.light .ah-hero {
   color: var(--lm-ink);
 }
 
+html.light .ah-clip {
+  mix-blend-mode: difference;
+}
+
+html.light .ah-word {
+  color: #fff;
+}
+
 .ah-blueprint {
   background:
     radial-gradient(circle at 50% 50%, transparent 28%, rgba(196, 158, 123, 0.16) 28.2%, transparent 28.5%),
