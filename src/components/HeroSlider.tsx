@@ -191,29 +191,31 @@ export function HeroSlider() {
       <div className="ah-blueprint pointer-events-none absolute inset-0" />
       <div className="pointer-events-none absolute inset-6 rounded-[28px] border border-gold/25 md:inset-10" />
 
-      <div className="absolute top-1/2 left-1/2 z-[1] h-[26vh] w-[38vw] min-h-[150px] min-w-0 max-w-[300px] -translate-x-1/2 -translate-y-1/2 md:h-[38vh] md:w-[22vw] md:min-h-[220px]">
-        <div className="ah-rig h-full w-full" style={{ transformStyle: "preserve-3d" }}>
-          <div
-            className="ah-card relative h-full w-full border border-white/15"
-            style={{ transformStyle: "preserve-3d" }}
-          >
-            <div className="ah-face ah-front absolute inset-0 overflow-hidden rounded-lg">
-              <img alt="" className="h-full w-full object-cover" />
-            </div>
-            <div className="ah-face ah-back absolute inset-0 overflow-hidden rounded-lg">
-              <img alt="" className="h-full w-full object-cover" />
+      <div className="ah-stack relative z-[1] flex w-full max-h-full flex-col items-center px-4 pb-8 pt-[5.75rem] md:px-8 md:pb-10 md:pt-24">
+        <div className="ah-frame z-[2]">
+          <div className="ah-rig h-full w-full" style={{ transformStyle: "preserve-3d" }}>
+            <div
+              className="ah-card relative h-full w-full border border-white/15"
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              <div className="ah-face ah-front absolute inset-0 overflow-hidden rounded-lg">
+                <img alt="" className="h-full w-full object-cover" />
+              </div>
+              <div className="ah-face ah-back absolute inset-0 overflow-hidden rounded-lg">
+                <img alt="" className="h-full w-full object-cover" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="ah-clip relative z-[2] h-[0.92em] w-full overflow-hidden text-center font-playfair text-[11vw] leading-none font-semibold tracking-[-0.03em] md:text-[11.5vw]">
-        <div className="ah-track">
-          {[...slides, slides[0]].map((slide, i) => (
-            <h1 key={`${slide.text}-${i}`} className="ah-word flex h-[0.92em] items-center justify-center">
-              {slide.text}
-            </h1>
-          ))}
+        <div className="ah-clip relative z-[1] mt-8 h-[0.92em] w-full overflow-hidden text-center font-playfair text-[11vw] leading-none font-semibold tracking-[-0.03em] md:mt-12 md:text-[11.5vw]">
+          <div className="ah-track">
+            {[...slides, slides[0]].map((slide, i) => (
+              <h1 key={`${slide.text}-${i}`} className="ah-word flex h-[0.92em] items-center justify-center">
+                {slide.text}
+              </h1>
+            ))}
+          </div>
         </div>
       </div>
     </section>

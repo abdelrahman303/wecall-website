@@ -3824,6 +3824,22 @@ html.light .qt-switch-knob {
   transform-style: preserve-3d;
 }
 
+.ah-frame {
+  width: min(64vw, 360px);
+  height: min(40vh, 420px, calc(100svh - 17rem));
+}
+
+@media (min-width: 768px) {
+  .ah-frame {
+    width: min(26vw, 460px);
+    height: min(52vh, 560px, calc(100svh - 18rem));
+  }
+}
+
+.ah-clip {
+  flex-shrink: 0;
+}
+
 .ah-face {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -3841,14 +3857,6 @@ html.light .qt-switch-knob {
 html.light .ah-hero {
   background: var(--lm-bg);
   color: var(--lm-ink);
-}
-
-html.light .ah-clip {
-  mix-blend-mode: difference;
-}
-
-html.light .ah-word {
-  color: #fff;
 }
 
 .ah-blueprint {
