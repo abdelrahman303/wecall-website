@@ -5,6 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ClaimSeatCta } from "./ClaimSeatCta";
 import { ThemePhoto } from "./ThemePhoto";
 import { photos } from "../media";
+import { scheduleRefresh } from "../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -145,7 +146,7 @@ export function AboutNarrative() {
       });
     }, root);
 
-    requestAnimationFrame(() => ScrollTrigger.refresh());
+    scheduleRefresh();
     return () => ctx.revert();
   }, []);
 

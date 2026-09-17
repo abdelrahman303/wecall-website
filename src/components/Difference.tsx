@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { wecallValues } from "../data";
 import { photos } from "../media";
 import { ThemePhoto } from "./ThemePhoto";
+import { onRafMove } from "../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -108,38 +109,37 @@ export function Difference() {
       });
     }, root);
 
-    const onMove = (e: MouseEvent) => {
+    const floatEls = Array.from(node.querySelectorAll<HTMLElement>(".floater"));
+    const pointers = floatEls.map((el) => ({
+      x: gsap.quickTo(el, "x", { duration: 0.9, ease: "power2.out" }),
+      rotateY: gsap.quickTo(el, "rotateY", { duration: 0.9, ease: "power2.out" }),
+      rotateX: gsap.quickTo(el, "rotateX", { duration: 0.9, ease: "power2.out" }),
+    }));
+
+    const stopMove = onRafMove(node, (x, y) => {
       if (!window.matchMedia("(pointer: fine)").matches) return;
-      const rect = node.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      node.querySelectorAll<HTMLElement>(".floater").forEach((el, i) => {
+      pointers.forEach((pointer, i) => {
         const depth = 14 + (i % 3) * 8;
-        gsap.to(el, {
-          rotateY: x * depth,
-          rotateX: -y * depth,
-          x: x * (8 + i * 3),
-          scale: 1,
-          duration: 0.9,
-          ease: "power2.out",
-          overwrite: "auto",
-        });
+        pointer.rotateY(x * depth);
+        pointer.rotateX(-y * depth);
+        pointer.x(x * (8 + i * 3));
       });
-    };
+    });
 
     const reset = () => {
-      node.querySelectorAll<HTMLElement>(".floater").forEach((el) => {
-        gsap.to(el, { rotateX: 0, rotateY: 0, x: 0, scale: 1, duration: 1, ease: "power3.out" });
+      pointers.forEach((pointer) => {
+        pointer.rotateX(0);
+        pointer.rotateY(0);
+        pointer.x(0);
       });
     };
 
-    node.addEventListener("mousemove", onMove);
     node.addEventListener("mouseleave", reset);
 
     return () => {
       if (timer) window.clearInterval(timer);
-      node.removeEventListener("mousemove", onMove);
       node.removeEventListener("mouseleave", reset);
+      stopMove();
       ctx.revert();
     };
   }, []);

@@ -139,5 +139,5 @@ export function CalendlyEmbed({ url, name, email, answers = [], onScheduled }: P
     };
   }, [url, name, email, answersKey, theme]);
 
-  return <div ref={host} className="qt-calendly" data-calendly-embed />;
+  return <div ref={host} className="qt-calendly" data-calendly-embed data-lenis-prevent />;
 }

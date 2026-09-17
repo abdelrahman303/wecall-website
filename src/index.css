@@ -32,6 +32,34 @@ html.lenis body {
   height: auto;
 }
 
+html.is-hidden-tab .marquee-track,
+html.is-hidden-tab .btn-track {
+  animation-play-state: paused !important;
+}
+
+.hero-img,
+.hero-collage,
+.floater,
+.intro-card,
+.intro-track,
+.ss-film,
+.sth-shot,
+.ah-card,
+.ah-rig,
+.fill-curve,
+.pr-card {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.hero-img,
+.floater,
+.intro-track,
+.marquee-track,
+.btn-track {
+  will-change: transform;
+}
+
 body {
   margin: 0;
   color: #fff;
@@ -2719,6 +2747,10 @@ html.light .keep-dark .tr-meter-copy span {
   box-shadow: 0 0 10px rgba(196, 158, 123, 0.7);
 }
 
+.ss-sec {
+  overflow-anchor: none;
+}
+
 .ss-pin {
   position: relative;
 }
@@ -2737,6 +2769,7 @@ html.light .keep-dark .tr-meter-copy span {
 .ss-filmstrip {
   overflow-x: auto;
   overflow-y: hidden;
+  overflow-anchor: none;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -2922,10 +2955,11 @@ html.light .keep-dark .tr-meter-copy span {
 
 .ss-dots-mobile {
   position: relative;
-  z-index: 6;
+  z-index: 8;
   display: flex;
   pointer-events: auto;
   padding: 2px 16px 6px;
+  touch-action: manipulation;
 }
 
 .ss-rail .ss-dots {
@@ -2934,8 +2968,9 @@ html.light .keep-dark .tr-meter-copy span {
 
 .ss-dot {
   display: flex;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   padding: 0;
@@ -2943,6 +2978,8 @@ html.light .keep-dark .tr-meter-copy span {
   background: transparent;
   cursor: pointer;
   pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ss-dot::before {
@@ -3187,10 +3224,12 @@ html.light .keep-dark .tr-meter-copy span {
   .ss-filmstrip {
     overflow-x: auto;
     overflow-y: hidden;
+    overflow-anchor: none;
     height: auto !important;
     scroll-snap-type: none;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-x;
+    overscroll-behavior-x: contain;
   }
 
   .ss-track {
@@ -3281,7 +3320,8 @@ html.light .keep-dark .tr-meter-copy span {
   }
 
   .ss-dots-mobile {
-    padding: 0 16px 4px;
+    z-index: 8;
+    padding: 4px 8px 8px;
   }
 
   .ss-close {

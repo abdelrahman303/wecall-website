@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ClaimSeatCta } from "./ClaimSeatCta";
 import { ThemePhoto } from "./ThemePhoto";
 import { photos } from "../media";
+import { scheduleRefresh } from "../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -104,7 +105,7 @@ export function SuccessStories() {
     const node = root.current;
     if (!node) return;
 
-    const films = Array.from(node.querySelectorAll<HTMLElement>(".ss-film"));
+    const films = Array.from(node.querySelectorAll<HTMLElement>(".ss-track > .ss-film"));
     const strip = node.querySelector<HTMLElement>(".ss-filmstrip");
     const track = node.querySelector<HTMLElement>(".ss-track");
     const bar = node.querySelector<HTMLElement>(".ss-scrub-bar");
@@ -115,16 +116,17 @@ export function SuccessStories() {
     const dots = Array.from(node.querySelectorAll<HTMLElement>(".ss-dot"));
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const desktopMq = window.matchMedia("(min-width: 768px)");
-    const desktop = desktopMq.matches;
+    const isDesktop = () => desktopMq.matches;
     let active = 0;
     let pinSt: ScrollTrigger | undefined;
 
     const paint = (index: number, progress = 0) => {
-      if (index !== active) {
-        active = index;
-        films.forEach((el, i) => el.classList.toggle("is-on", i === index));
-        dots.forEach((el, i) => el.classList.toggle("is-on", i === index));
-        const item = cases[index];
+      const next = ((index % cases.length) + cases.length) % cases.length;
+      if (next !== active) {
+        active = next;
+        films.forEach((el, i) => el.classList.toggle("is-on", i === next));
+        dots.forEach((el) => el.classList.toggle("is-on", Number(el.dataset.i) === next));
+        const item = cases[next];
         if (idxEl) idxEl.textContent = item.id;
         if (nameEl) nameEl.textContent = item.label;
         if (metricEl) metricEl.textContent = item.metric;
@@ -219,45 +221,53 @@ export function SuccessStories() {
     };
 
     const onStripScroll = () => {
-      if (desktop || !strip) return;
+      if (isDesktop() || !strip) return;
       if (frame) return;
       frame = window.requestAnimationFrame(() => {
         frame = 0;
         const loop = track ? track.scrollWidth / 2 : strip.scrollWidth;
         const max = Math.max(loop, 1);
         const progress = (strip.scrollLeft % max) / max;
-        const i = Math.min(cases.length - 1, Math.round(progress * (cases.length - 1)));
+        const i = Math.min(cases.length - 1, Math.floor((progress + 0.5 / cases.length) * cases.length) % cases.length);
         paint(i, progress);
       });
     };
 
-    const onDot = (event: Event) => {
+    const scrollStripTo = (index: number) => {
+      if (!strip || !track) return;
+      const film = films[index];
+      if (!film) return;
+      const loopAt = track.scrollWidth / 2;
+      if (loopAt > 0 && strip.scrollLeft >= loopAt) {
+        strip.scrollLeft -= loopAt;
+      }
+      const left = strip.scrollLeft + (film.getBoundingClientRect().left - strip.getBoundingClientRect().left) - 14;
+      strip.scrollLeft = Math.max(0, left);
+    };
+
+    const onDotPointer = (event: Event) => {
+      const pointer = event as PointerEvent;
+      if (typeof pointer.button === "number" && pointer.button !== 0) return;
       event.preventDefault();
       event.stopPropagation();
       const button = event.currentTarget as HTMLElement;
       const i = Number(button.dataset.i || 0);
-      const film = films[i];
-      if (!film || !strip) return;
-      if (desktop) {
+      if (isDesktop()) {
         if (pinSt) {
           pinSt.scroll(pinSt.start + (pinSt.end - pinSt.start) * (i / Math.max(cases.length - 1, 1)));
         }
         return;
       }
       pauseAuto();
-      const loopAt = track ? track.scrollWidth / 2 : 0;
-      if (loopAt > 0 && strip.scrollLeft >= loopAt) {
-        strip.scrollLeft -= loopAt;
-      }
-      strip.scrollTo({ left: Math.max(0, film.offsetLeft - 16), behavior: "smooth" });
+      scrollStripTo(i);
       paint(i, i / Math.max(cases.length - 1, 1));
       resumeAuto();
     };
 
     strip?.addEventListener("scroll", onStripScroll, { passive: true });
     dots.forEach((dot) => {
-      dot.addEventListener("click", onDot);
-      dot.addEventListener("pointerdown", pauseAuto);
+      dot.addEventListener("pointerdown", onDotPointer);
+      dot.addEventListener("click", onDotPointer);
     });
 
     const stopAuto = () => {
@@ -266,17 +276,19 @@ export function SuccessStories() {
       window.clearTimeout(resumeTimer);
     };
 
-    if (!desktop && !reduce && strip && track) {
+    if (!isDesktop() && !reduce && strip && track) {
       Array.from(track.children).forEach((child) => {
         const clone = child.cloneNode(true) as HTMLElement;
         clone.setAttribute("aria-hidden", "true");
         clone.classList.remove("is-on");
+        clone.querySelectorAll("a, button").forEach((el) => el.setAttribute("tabindex", "-1"));
         track.appendChild(clone);
         clones.push(clone);
       });
 
       let running = false;
-      const tick = () => {
+      let last = performance.now();
+      const tick = (now: number) => {
         if (!running) {
           autoRaf = 0;
           return;
@@ -284,28 +296,40 @@ export function SuccessStories() {
         if (!paused) {
           const loopAt = track.scrollWidth / 2;
           if (loopAt > 0) {
-            strip.scrollLeft += 2.15;
+            const dt = Math.min(now - last, 32);
+            strip.scrollLeft += 2.4 * (dt / 16.67);
             if (strip.scrollLeft >= loopAt) strip.scrollLeft -= loopAt;
           }
         }
+        last = now;
         autoRaf = window.requestAnimationFrame(tick);
+      };
+
+      const startAuto = () => {
+        if (running) return;
+        running = true;
+        last = performance.now();
+        if (!autoRaf) autoRaf = window.requestAnimationFrame(tick);
       };
 
       io = new IntersectionObserver(
         ([entry]) => {
-          running = Boolean(entry?.isIntersecting);
-          if (running && !autoRaf) autoRaf = window.requestAnimationFrame(tick);
+          if (entry?.isIntersecting) startAuto();
+          else {
+            running = false;
+          }
         },
-        { threshold: 0.12 },
+        { threshold: 0, rootMargin: "40px 0px" },
       );
       io.observe(strip);
+      startAuto();
 
       strip.addEventListener("pointerdown", pauseAuto);
       strip.addEventListener("pointerup", resumeAuto);
       strip.addEventListener("pointercancel", resumeAuto);
     }
 
-    if (desktop) requestAnimationFrame(() => ScrollTrigger.refresh());
+    if (isDesktop()) scheduleRefresh();
 
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
@@ -317,8 +341,8 @@ export function SuccessStories() {
       io?.disconnect();
       strip?.removeEventListener("scroll", onStripScroll);
       dots.forEach((dot) => {
-        dot.removeEventListener("click", onDot);
-        dot.removeEventListener("pointerdown", pauseAuto);
+        dot.removeEventListener("pointerdown", onDotPointer);
+        dot.removeEventListener("click", onDotPointer);
       });
       ctx.revert();
     };
@@ -397,6 +421,7 @@ export function SuccessStories() {
                   type="button"
                   className={`ss-dot ${i === 0 ? "is-on" : ""}`}
                   data-i={i}
+                  tabIndex={-1}
                   aria-label={`Show ${item.label}`}
                 />
               ))}
@@ -406,7 +431,7 @@ export function SuccessStories() {
             </p>
           </aside>
 
-          <div className="ss-filmstrip">
+          <div className="ss-filmstrip" data-lenis-prevent>
             <div className="ss-track">
               {cases.map((item, i) => (
                 <article key={item.id} className={`ss-film ${item.kind} ${i === 0 ? "is-on" : ""}`}>
@@ -453,13 +478,14 @@ export function SuccessStories() {
               ))}
             </div>
           </div>
-          <div className="ss-dots ss-dots-mobile">
+          <div className="ss-dots ss-dots-mobile" data-lenis-prevent>
             {cases.map((item, i) => (
               <button
                 key={`m-${item.id}`}
                 type="button"
                 className={`ss-dot ${i === 0 ? "is-on" : ""}`}
                 data-i={i}
+                tabIndex={-1}
                 aria-label={`Show ${item.label}`}
               />
             ))}

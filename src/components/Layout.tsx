@@ -4,8 +4,8 @@ import { useLenis } from "../hooks/useLenis";
 import { Header } from "./Header";
 import { Menu } from "./Menu";
 import { Footer } from "./Footer";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { scrollToTop } from "../lib/smoothScroll";
+import { scheduleRefresh, watchInfiniteAnimations } from "../lib/motion";
 
 export function Layout() {
   const [menu, setMenu] = useState(false);
@@ -19,12 +19,12 @@ export function Layout() {
     scrollToTop(false);
     const mobile = window.matchMedia("(max-width: 767px)").matches;
     if (mobile) {
-      requestAnimationFrame(() => ScrollTrigger.refresh());
+      scheduleRefresh();
       return;
     }
     const timer = window.setTimeout(() => {
       scrollToTop(false);
-      requestAnimationFrame(() => ScrollTrigger.refresh());
+      scheduleRefresh();
     }, 40);
     const late = window.setTimeout(() => scrollToTop(false), 160);
     return () => {
@@ -32,6 +32,8 @@ export function Layout() {
       window.clearTimeout(late);
     };
   }, [location.pathname, location.key]);
+
+  useEffect(() => watchInfiniteAnimations(document), [location.pathname]);
 
   useEffect(() => {
     const onNavClick = (event: MouseEvent) => {

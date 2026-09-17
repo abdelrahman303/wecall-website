@@ -22,7 +22,7 @@ export function FillText() {
 
     const ctx = gsap.context(() => {
       const letters = gsap.utils.toArray<HTMLElement>(".fill-letter");
-      gsap.set(letters, { color: "rgba(255,255,255,0.12)" });
+      gsap.set(letters, { color: "rgba(255,255,255,0.12)", force3D: false });
       gsap.set(".fill-curve", { yPercent: mobile ? 58 : 72 });
 
       const tl = gsap.timeline({
@@ -33,7 +33,7 @@ export function FillText() {
           scrub: mobile ? true : 0.28,
           pin: true,
           anticipatePin: 1,
-          fastScrollEnd: mobile,
+          fastScrollEnd: true,
           invalidateOnRefresh: true,
         },
       });
@@ -43,6 +43,7 @@ export function FillText() {
         stagger: mobile ? 0.022 : 0.038,
         ease: "none",
         duration: 0.2,
+        force3D: false,
       }).to(
         ".fill-curve",
         {
@@ -59,9 +60,10 @@ export function FillText() {
   return (
     <section ref={root} className="fill-sec keep-dark relative z-[2] overflow-hidden bg-ink">
       <div className="relative flex h-screen items-center justify-center">
-        <ThemePhoto
+        <        ThemePhoto
           light={photos.seats.light}
           dark={photos.seats.dark}
+          eager
           className="absolute inset-0 h-full w-full object-cover md:scale-[1.04]"
         />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(25,29,35,0.28)_0%,rgba(25,29,35,0.62)_58%,rgba(25,29,35,0.88)_100%)]" />

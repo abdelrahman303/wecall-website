@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-
 import { photos } from "../media";
+import { onRafMove } from "../lib/motion";
 
 const slides = [
   { text: "Off-Market", light: photos.deals.light, dark: photos.deals.dark, rotate: -8 },
@@ -38,12 +38,14 @@ export function HeroSlider() {
       transformOrigin: "center center",
       scale: 1,
       z: 0,
+      force3D: true,
     });
     gsap.set(card, {
       rotate: slides[0].rotate,
       rotateX: 0,
       transformOrigin: "center center",
       transformPerspective: 1800,
+      force3D: true,
     });
     gsap.set(track, { y: 0 });
     const faceSrc = (slide: (typeof slides)[number]) =>
@@ -61,11 +63,6 @@ export function HeroSlider() {
       const next = (index + 1) % n;
       const after = (index + 2) % n;
       const toBack = !showingBack;
-
-      // Store current mouse-driven transforms
-      const currentRotateX = gsap.getProperty(card, "rotateX") as number || 0;
-      const currentRotateY = gsap.getProperty(card, "rotateY") as number || 0;
-      const currentZ = gsap.getProperty(card, "z") as number || 0;
 
       // Kill ONLY mouse animations on card, keep the flip
       gsap.killTweensOf(card, "rotateX,rotateY,z,skewX,skewY");
@@ -123,74 +120,40 @@ export function HeroSlider() {
       tl.set(card, { rotateX: toBack ? 180 : 0 });
     };
 
+    const rigX = gsap.quickTo(rig, "x", { duration: 0.15, ease: "power2.out" });
+    const rigY = gsap.quickTo(rig, "y", { duration: 0.15, ease: "power2.out" });
+    const cardTiltX = gsap.quickTo(card, "rotateX", { duration: 0.15, ease: "power2.out" });
+    const cardTiltY = gsap.quickTo(card, "rotateY", { duration: 0.15, ease: "power2.out" });
+    const cardZ = gsap.quickTo(card, "z", { duration: 0.15, ease: "power2.out" });
+
     const start = setTimeout(flip, 2200);
 
-    // Mouse movement - smooth and snappy, doesn't interfere with flip
-    const onMove = (e: MouseEvent) => {
+    const stopMove = onRafMove(node, (nx, ny) => {
       if (!window.matchMedia("(pointer: fine)").matches) return;
-      const rect = node.getBoundingClientRect();
-      const nx = (e.clientX - rect.left) / rect.width - 0.5;
-      const ny = (e.clientY - rect.top) / rect.height - 0.5;
-      
-      // Store current mouse position
       currentNX = nx;
       currentNY = ny;
-
       const distance = Math.hypot(nx, ny);
-
-      // Only apply mouse movement if not flipping
+      rigX(nx * 200);
+      rigY(ny * 100);
       if (!isFlipping) {
-        gsap.to(rig, {
-          x: nx * 200,
-          y: ny * 100,
-          duration: 0.15,
-          ease: "power2.out",
-          overwrite: "auto",
-        });
-
-        gsap.to(card, {
-          rotateX: -ny * 30,
-          rotateY: nx * 30,
-          z: -distance * 100,
-          duration: 0.15,
-          ease: "power2.out",
-          overwrite: "auto",
-        });
-      } else {
-        // Still move the rig during flip, just not the card
-        gsap.to(rig, {
-          x: nx * 200,
-          y: ny * 100,
-          duration: 0.15,
-          ease: "power2.out",
-          overwrite: "auto",
-        });
+        cardTiltX(-ny * 30);
+        cardTiltY(nx * 30);
+        cardZ(-distance * 100);
       }
-    };
+    });
 
     const reset = () => {
       currentNX = 0;
       currentNY = 0;
-      gsap.to(rig, {
-        x: 0,
-        y: 0,
-        duration: 0.5,
-        ease: "power3.out",
-        overwrite: "auto",
-      });
+      rigX(0);
+      rigY(0);
       if (!isFlipping) {
-        gsap.to(card, {
-          rotateX: 0,
-          rotateY: 0,
-          z: 0,
-          duration: 0.5,
-          ease: "power3.out",
-          overwrite: "auto",
-        });
+        cardTiltX(0);
+        cardTiltY(0);
+        cardZ(0);
       }
     };
 
-    node.addEventListener("mousemove", onMove);
     node.addEventListener("mouseleave", reset);
 
     const io = new IntersectionObserver(
@@ -213,7 +176,7 @@ export function HeroSlider() {
       clearTimeout(start);
       clearTimeout(flipTimeout);
       io.disconnect();
-      node.removeEventListener("mousemove", onMove);
+      stopMove();
       node.removeEventListener("mouseleave", reset);
       gsap.killTweensOf([rig, card, track]);
     };

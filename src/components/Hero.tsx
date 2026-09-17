@@ -4,6 +4,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { photos } from "../media";
 import { ClaimSeatCta } from "./ClaimSeatCta";
+import { ThemePhoto } from "./ThemePhoto";
+import { scheduleRefresh } from "../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -80,6 +82,7 @@ export function Hero() {
           opacity: 0,
           scale: mobile ? 1.06 : 1.12,
           rotation: x > 0 ? 8 : -8,
+          force3D: true,
         });
       });
 
@@ -160,6 +163,7 @@ export function Hero() {
           pin: true,
           scrub: mobile ? 0.16 : 0.16,
           anticipatePin: 1,
+          fastScrollEnd: true,
           invalidateOnRefresh: true,
         },
       });
@@ -223,7 +227,7 @@ export function Hero() {
         "<",
       );
 
-      requestAnimationFrame(() => ScrollTrigger.refresh());
+      scheduleRefresh();
     }, root);
 
     return () => {
@@ -554,8 +558,7 @@ function HeroShot({
   return (
     <div className={className}>
       <div className="relative h-full w-full overflow-hidden">
-        <img src={dark} alt="" className="block h-full w-full object-cover light:hidden" />
-        <img src={light} alt="" className="hidden h-full w-full object-cover light:block" />
+        <ThemePhoto light={light} dark={dark} eager className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-[#c49e7b]/18 light:bg-cream/10" />
       </div>
     </div>

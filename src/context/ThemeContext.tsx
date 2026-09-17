@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { scheduleRefresh } from "../lib/motion";
 
 type Theme = "dark" | "light";
 
@@ -18,7 +18,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.documentElement.classList.toggle("light", theme === "light");
     document.documentElement.classList.toggle("dark", theme === "dark");
     localStorage.setItem("wecall-theme", theme);
-    requestAnimationFrame(() => ScrollTrigger.refresh());
+    scheduleRefresh();
   }, [theme]);
 
   return (

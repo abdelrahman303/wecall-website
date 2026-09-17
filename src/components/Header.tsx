@@ -14,7 +14,9 @@ export function Header({ onOpenMenu }: Props) {
 
   useEffect(() => {
     let last = window.scrollY;
-    const onScroll = () => {
+    let raf = 0;
+    const apply = () => {
+      raf = 0;
       const y = window.scrollY;
       const mobile = window.matchMedia("(max-width: 767px)").matches;
       const nextHidden = !mobile && y > last && y > 90;
@@ -23,9 +25,16 @@ export function Header({ onOpenMenu }: Props) {
       setScrolled((prev) => (prev === nextScrolled ? prev : nextScrolled));
       last = y;
     };
-    onScroll();
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(apply);
+    };
+    apply();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
   }, []);
 
   return (

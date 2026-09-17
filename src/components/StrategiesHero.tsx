@@ -5,6 +5,7 @@ import { photos } from "../media";
 import { ThemePhoto } from "./ThemePhoto";
 import { ClaimSeatCta } from "./ClaimSeatCta";
 import { scrollToTarget } from "../lib/smoothScroll";
+import { onRafMove, scheduleRefresh } from "../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -148,23 +149,19 @@ export function StrategiesHero() {
         const tiltY = gsap.quickTo(".sth-stage-tilt", "rotateY", { duration: 0.7, ease: "power3.out" });
         const tiltX = gsap.quickTo(".sth-stage-tilt", "rotateX", { duration: 0.7, ease: "power3.out" });
 
-        const onMove = (event: MouseEvent) => {
-          const box = node.getBoundingClientRect();
-          const x = (event.clientX - box.left) / box.width - 0.5;
-          const y = (event.clientY - box.top) / box.height - 0.5;
+        const stopMove = onRafMove(node, (x, y) => {
           tiltY(x * 4);
           tiltX(-y * 3);
-        };
+        });
 
         const onLeave = () => {
           tiltY(0);
           tiltX(0);
         };
 
-        node.addEventListener("mousemove", onMove);
         node.addEventListener("mouseleave", onLeave);
         cleanups.push(() => {
-          node.removeEventListener("mousemove", onMove);
+          stopMove();
           node.removeEventListener("mouseleave", onLeave);
         });
       }
@@ -227,7 +224,7 @@ export function StrategiesHero() {
         });
       }
 
-      requestAnimationFrame(() => ScrollTrigger.refresh());
+      scheduleRefresh();
     }, node);
 
     return () => {

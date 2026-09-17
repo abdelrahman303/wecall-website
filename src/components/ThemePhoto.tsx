@@ -1,18 +1,30 @@
+import { useTheme } from "../context/ThemeContext";
+
 export function ThemePhoto({
   light,
   dark,
   className = "",
   alt = "",
+  eager = false,
 }: {
   light: string;
   dark: string;
   className?: string;
   alt?: string;
+  eager?: boolean;
 }) {
+  const { theme } = useTheme();
+  const src = theme === "light" ? light : dark;
+
   return (
-    <>
-      <img src={dark} alt={alt} className={`block light:hidden ${className}`} />
-      <img src={light} alt={alt} className={`hidden light:block ${className}`} />
-    </>
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      decoding="async"
+      loading={eager ? "eager" : "lazy"}
+      fetchPriority={eager ? "high" : "low"}
+      draggable={false}
+    />
   );
 }
