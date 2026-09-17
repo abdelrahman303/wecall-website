@@ -14,15 +14,11 @@ export function scheduleRefresh() {
 }
 
 export function initMotion() {
+  const touch = window.matchMedia("(pointer: coarse)").matches;
   gsap.config({
-    force3D: true,
     nullTargetWarn: false,
     autoSleep: 60,
-  });
-  gsap.defaults({
-    force3D: true,
-    overwrite: "auto",
-    lazy: false,
+    force3D: touch ? false : true,
   });
   ScrollTrigger.config({
     ignoreMobileResize: true,
@@ -30,8 +26,16 @@ export function initMotion() {
     autoRefreshEvents: "visibilitychange,DOMContentLoaded,load",
   });
 
-  const touch = window.matchMedia("(pointer: coarse)").matches;
-  gsap.ticker.lagSmoothing(touch ? 500 : 0, 33);
+  if (touch) {
+    gsap.ticker.lagSmoothing(500, 33);
+    return;
+  }
+
+  gsap.defaults({
+    force3D: true,
+    overwrite: "auto",
+  });
+  gsap.ticker.lagSmoothing(0, 33);
   gsap.ticker.fps(60);
 
   const onVisibility = () => {

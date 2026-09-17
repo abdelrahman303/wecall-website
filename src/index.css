@@ -3222,19 +3222,23 @@ html.light .keep-dark .tr-meter-copy span {
   }
 
   .ss-filmstrip {
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow: hidden;
     overflow-anchor: none;
     height: auto !important;
     scroll-snap-type: none;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
-    overscroll-behavior-x: contain;
+    touch-action: pan-y;
+    isolation: isolate;
   }
 
   .ss-track {
     align-items: flex-start;
     padding: 0 14px;
+    transform: translate3d(0, 0, 0);
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ss-film.is-on .ss-film-photo img {
+    animation: none;
   }
 
   .ss-film {
@@ -3306,6 +3310,7 @@ html.light .keep-dark .tr-meter-copy span {
   .ss-file {
     margin-top: 8px;
     padding: 6px 8px;
+    backdrop-filter: none;
   }
 
   .ss-file p:last-child {

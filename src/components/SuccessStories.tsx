@@ -137,6 +137,24 @@ export function SuccessStories() {
 
     paint(0, 0.06);
 
+    const slideTo = (index: number) => {
+      if (!track) return;
+      const next = ((index % cases.length) + cases.length) % cases.length;
+      const film = films[next];
+      if (!film) return;
+      const pad = Number.parseFloat(window.getComputedStyle(track).paddingLeft) || 0;
+      const wrap = active === cases.length - 1 && next === 0;
+      if (wrap) track.style.transition = "none";
+      track.style.transform = `translate3d(${-(film.offsetLeft - pad)}px,0,0)`;
+      paint(next, next / Math.max(cases.length - 1, 1));
+      if (wrap) {
+        track.offsetWidth;
+        requestAnimationFrame(() => {
+          track.style.transition = "";
+        });
+      }
+    };
+
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
 
@@ -203,46 +221,34 @@ export function SuccessStories() {
       });
     }, root);
 
-    let frame = 0;
-    let autoRaf = 0;
+    let autoTimer = 0;
     let resumeTimer = 0;
-    let paused = false;
-    const clones: HTMLElement[] = [];
+    let inView = false;
+    let startX = 0;
     let io: IntersectionObserver | undefined;
-    const pauseAuto = () => {
-      paused = true;
+
+    const stopAuto = () => {
+      window.clearInterval(autoTimer);
+      autoTimer = 0;
       window.clearTimeout(resumeTimer);
     };
+
+    const startAuto = () => {
+      if (isDesktop() || reduce || autoTimer) return;
+      autoTimer = window.setInterval(() => slideTo(active + 1), 3400);
+    };
+
+    const pauseAuto = () => {
+      window.clearInterval(autoTimer);
+      autoTimer = 0;
+      window.clearTimeout(resumeTimer);
+    };
+
     const resumeAuto = () => {
       window.clearTimeout(resumeTimer);
       resumeTimer = window.setTimeout(() => {
-        paused = false;
-      }, 3200);
-    };
-
-    const onStripScroll = () => {
-      if (isDesktop() || !strip) return;
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        const loop = track ? track.scrollWidth / 2 : strip.scrollWidth;
-        const max = Math.max(loop, 1);
-        const progress = (strip.scrollLeft % max) / max;
-        const i = Math.min(cases.length - 1, Math.floor((progress + 0.5 / cases.length) * cases.length) % cases.length);
-        paint(i, progress);
-      });
-    };
-
-    const scrollStripTo = (index: number) => {
-      if (!strip || !track) return;
-      const film = films[index];
-      if (!film) return;
-      const loopAt = track.scrollWidth / 2;
-      if (loopAt > 0 && strip.scrollLeft >= loopAt) {
-        strip.scrollLeft -= loopAt;
-      }
-      const left = strip.scrollLeft + (film.getBoundingClientRect().left - strip.getBoundingClientRect().left) - 14;
-      strip.scrollLeft = Math.max(0, left);
+        if (inView) startAuto();
+      }, 2800);
     };
 
     const onDotPointer = (event: Event) => {
@@ -259,91 +265,57 @@ export function SuccessStories() {
         return;
       }
       pauseAuto();
-      scrollStripTo(i);
-      paint(i, i / Math.max(cases.length - 1, 1));
+      slideTo(i);
       resumeAuto();
     };
 
-    strip?.addEventListener("scroll", onStripScroll, { passive: true });
+    const onStripDown = (event: PointerEvent) => {
+      if (isDesktop()) return;
+      startX = event.clientX;
+      pauseAuto();
+    };
+
+    const onStripUp = (event: PointerEvent) => {
+      if (isDesktop()) return;
+      const dx = event.clientX - startX;
+      if (dx < -40) slideTo(active + 1);
+      else if (dx > 40) slideTo(active - 1);
+      resumeAuto();
+    };
+
     dots.forEach((dot) => {
       dot.addEventListener("pointerdown", onDotPointer);
       dot.addEventListener("click", onDotPointer);
     });
 
-    const stopAuto = () => {
-      if (autoRaf) window.cancelAnimationFrame(autoRaf);
-      autoRaf = 0;
-      window.clearTimeout(resumeTimer);
-    };
-
-    if (!isDesktop() && !reduce && strip && track) {
-      Array.from(track.children).forEach((child) => {
-        const clone = child.cloneNode(true) as HTMLElement;
-        clone.setAttribute("aria-hidden", "true");
-        clone.classList.remove("is-on");
-        clone.querySelectorAll("a, button").forEach((el) => el.setAttribute("tabindex", "-1"));
-        track.appendChild(clone);
-        clones.push(clone);
-      });
-
-      let running = false;
-      let last = performance.now();
-      const tick = (now: number) => {
-        if (!running) {
-          autoRaf = 0;
-          return;
-        }
-        if (!paused) {
-          const loopAt = track.scrollWidth / 2;
-          if (loopAt > 0) {
-            const dt = Math.min(now - last, 32);
-            strip.scrollLeft += 2.4 * (dt / 16.67);
-            if (strip.scrollLeft >= loopAt) strip.scrollLeft -= loopAt;
-          }
-        }
-        last = now;
-        autoRaf = window.requestAnimationFrame(tick);
-      };
-
-      const startAuto = () => {
-        if (running) return;
-        running = true;
-        last = performance.now();
-        if (!autoRaf) autoRaf = window.requestAnimationFrame(tick);
-      };
-
+    if (!isDesktop() && strip && track) {
       io = new IntersectionObserver(
         ([entry]) => {
-          if (entry?.isIntersecting) startAuto();
-          else {
-            running = false;
-          }
+          inView = Boolean(entry?.isIntersecting);
+          if (inView && !reduce) startAuto();
+          else pauseAuto();
         },
-        { threshold: 0, rootMargin: "40px 0px" },
+        { threshold: 0.25 },
       );
       io.observe(strip);
-      startAuto();
-
-      strip.addEventListener("pointerdown", pauseAuto);
-      strip.addEventListener("pointerup", resumeAuto);
+      strip.addEventListener("pointerdown", onStripDown, { passive: true });
+      strip.addEventListener("pointerup", onStripUp, { passive: true });
       strip.addEventListener("pointercancel", resumeAuto);
     }
 
     if (isDesktop()) scheduleRefresh();
 
     return () => {
-      if (frame) window.cancelAnimationFrame(frame);
       stopAuto();
-      clones.forEach((el) => el.remove());
-      strip?.removeEventListener("pointerdown", pauseAuto);
-      strip?.removeEventListener("pointerup", resumeAuto);
-      strip?.removeEventListener("pointercancel", resumeAuto);
       io?.disconnect();
-      strip?.removeEventListener("scroll", onStripScroll);
+      strip?.removeEventListener("pointerdown", onStripDown);
+      strip?.removeEventListener("pointerup", onStripUp);
+      strip?.removeEventListener("pointercancel", resumeAuto);
       dots.forEach((dot) => {
         dot.removeEventListener("pointerdown", onDotPointer);
         dot.removeEventListener("click", onDotPointer);
       });
+      if (track && !isDesktop()) track.style.transform = "";
       ctx.revert();
     };
   }, []);
