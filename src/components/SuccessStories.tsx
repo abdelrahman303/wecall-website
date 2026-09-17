@@ -333,7 +333,7 @@ export function SuccessStories() {
   }, []);
 
   return (
-    <section ref={root} id="proof" className="ss-sec keep-dark relative bg-ink text-white">
+    <section ref={root} id="proof" className="ss-sec relative bg-ink text-white">
       <div className="ss-head relative overflow-x-clip px-4 pt-12 pb-6 md:px-10 md:pt-24 md:pb-8">
         <p className="ss-script pointer-events-none absolute top-6 left-1/2 z-0 -translate-x-1/2 font-mariyam text-[22vw] leading-none text-gold/15 md:top-4 md:text-[9.5vw]">
           successes
@@ -357,7 +357,7 @@ export function SuccessStories() {
               Auto-plays · swipe anytime
             </p>
           </div>
-          <div className="ss-head-in tr-meter keep-dark mx-auto">
+          <div className="ss-head-in tr-meter mx-auto">
             <svg viewBox="0 0 200 200" aria-hidden>
               <circle className="tr-track" cx="100" cy="100" r="88" />
               <circle className="tr-arc" cx="100" cy="100" r="88" />

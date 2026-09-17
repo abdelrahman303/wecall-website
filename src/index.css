@@ -3036,6 +3036,99 @@ html.light .keep-dark .tr-meter-copy span {
   background: linear-gradient(180deg, rgba(25, 29, 35, 0.72), rgba(25, 29, 35, 0.88));
 }
 
+html.light .ss-sec .ss-script {
+  color: rgba(106, 78, 52, 0.16);
+}
+
+html.light .ss-sec .ss-ticker {
+  border-color: rgba(106, 78, 52, 0.22);
+}
+
+html.light .ss-sec .ss-ticker-dot {
+  background: var(--lm-gold);
+  box-shadow: 0 0 10px rgba(106, 78, 52, 0.28);
+}
+
+html.light .ss-sec .ss-film {
+  border-color: rgba(106, 78, 52, 0.28);
+  background: var(--lm-paper);
+}
+
+html.light .ss-sec .ss-film-veil {
+  background:
+    linear-gradient(180deg, rgba(217, 207, 195, 0.12) 0%, rgba(217, 207, 195, 0.4) 42%, rgba(217, 207, 195, 0.94) 100%),
+    linear-gradient(90deg, rgba(217, 207, 195, 0.5), transparent 55%);
+}
+
+html.light .ss-sec .ss-film.fix .ss-film-veil {
+  background:
+    linear-gradient(180deg, rgba(217, 207, 195, 0.18) 0%, rgba(196, 168, 148, 0.5) 48%, rgba(217, 207, 195, 0.95) 100%),
+    linear-gradient(90deg, rgba(217, 207, 195, 0.52), transparent 60%);
+}
+
+html.light .ss-sec .ss-film-mark {
+  color: rgba(106, 78, 52, 0.16);
+}
+
+html.light .ss-sec .ss-film-script,
+html.light .ss-sec .ss-film-metric,
+html.light .ss-sec .ss-file span {
+  color: var(--lm-gold);
+}
+
+html.light .ss-sec .ss-film-copy h3 {
+  color: var(--lm-ink);
+}
+
+html.light .ss-sec .ss-film-cap,
+html.light .ss-sec .ss-film-quote {
+  color: rgba(26, 22, 19, 0.82);
+}
+
+html.light .ss-sec .ss-chips li {
+  border-color: rgba(106, 78, 52, 0.35);
+  background: rgba(255, 255, 255, 0.35);
+  color: rgba(26, 22, 19, 0.82);
+}
+
+html.light .ss-sec .ss-file {
+  border-color: rgba(106, 78, 52, 0.4);
+  background: rgba(255, 255, 255, 0.42);
+}
+
+html.light .ss-sec .ss-file p {
+  color: rgba(26, 22, 19, 0.72);
+}
+
+html.light .ss-sec .ss-file em {
+  color: rgba(26, 22, 19, 0.5);
+}
+
+html.light .ss-sec .ss-dot::before {
+  background: rgba(106, 78, 52, 0.28);
+}
+
+html.light .ss-sec .ss-dot.is-on::before,
+html.light .ss-sec .ss-scrub-bar {
+  background: var(--lm-gold);
+}
+
+html.light .ss-sec .ss-scrub {
+  background: rgba(106, 78, 52, 0.18);
+}
+
+html.light .ss-sec .ss-close-veil {
+  background: linear-gradient(180deg, rgba(200, 189, 176, 0.78), rgba(181, 168, 153, 0.9));
+}
+
+html.light .ss-sec .ss-film.is-on {
+  box-shadow: 0 24px 60px rgba(26, 22, 19, 0.16), 0 0 0 1px rgba(106, 78, 52, 0.32);
+}
+
+html.light .ss-sec .tr-track {
+  stroke: rgba(58, 40, 28, 0.22);
+}
+
 @keyframes ssKen {
   from {
     transform: scale(1.06) translate3d(0, 0, 0);
