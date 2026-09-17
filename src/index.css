@@ -941,6 +941,21 @@ html.light .plus-circle-track {
   color: #191d23;
 }
 
+html.light .hero-cta-ghost {
+  color: var(--lm-gold);
+  border-color: var(--lm-gold);
+  background: rgba(255, 252, 247, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(106, 78, 52, 0.16),
+    0 8px 18px rgba(26, 22, 19, 0.12);
+}
+
+html.light .hero-cta-ghost:hover {
+  background: var(--lm-gold);
+  color: #f4ece4;
+  box-shadow: 0 10px 22px rgba(26, 22, 19, 0.16);
+}
+
 .hero-cta-orb {
   display: flex;
   height: 84px;
