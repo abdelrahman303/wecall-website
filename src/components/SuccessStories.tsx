@@ -415,7 +415,7 @@ export function SuccessStories() {
             </p>
           </aside>
 
-          <div className="ss-filmstrip" data-lenis-prevent>
+          <div className="ss-filmstrip">
             <div className="ss-track">
               {cases.map((item, i) => (
                 <article key={item.id} className={`ss-film ${item.kind} ${i === 0 ? "is-on" : ""}`}>
@@ -462,7 +462,7 @@ export function SuccessStories() {
               ))}
             </div>
           </div>
-          <div className="ss-dots ss-dots-mobile" data-lenis-prevent>
+          <div className="ss-dots ss-dots-mobile">
             {cases.map((item, i) => (
               <button
                 key={`m-${item.id}`}
