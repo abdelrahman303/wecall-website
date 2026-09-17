@@ -3298,13 +3298,12 @@ html.light .keep-dark .tr-meter-copy span {
   }
 
   .ss-film-quote {
-    display: -webkit-box;
+    display: block;
     margin-top: 8px;
-    overflow: hidden;
+    overflow: visible;
     font-size: 13px;
     line-height: 1.45;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: unset;
   }
 
   .ss-file {
@@ -3314,7 +3313,8 @@ html.light .keep-dark .tr-meter-copy span {
   }
 
   .ss-file p:last-child {
-    display: none;
+    display: block;
+    overflow-wrap: anywhere;
   }
 
   .ss-film.is-on .ss-film-photo img,

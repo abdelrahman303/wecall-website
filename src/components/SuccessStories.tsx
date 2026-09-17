@@ -98,6 +98,18 @@ const cases = [
   },
 ];
 
+function hashEmail(email: string) {
+  const [user = "", domain = ""] = email.split("@");
+  const dot = domain.indexOf(".");
+  const host = dot === -1 ? domain : domain.slice(0, dot);
+  const tld = dot === -1 ? "" : domain.slice(dot);
+  return `${user.slice(0, 1)}••••@${host.slice(0, 1)}••••${tld}`;
+}
+
+function hashPhone() {
+  return "+1 (•••) •••-••••";
+}
+
 export function SuccessStories() {
   const root = useRef<HTMLElement>(null);
 
@@ -442,7 +454,7 @@ export function SuccessStories() {
                         <em> · {item.market}</em>
                       </p>
                       <p className="ss-hash">
-                        {item.email} · {item.phone}
+                        {hashEmail(item.email)} · {hashPhone()}
                       </p>
                     </div>
                   </div>
